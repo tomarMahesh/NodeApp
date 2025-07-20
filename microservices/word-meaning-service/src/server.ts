@@ -2,7 +2,5 @@ import app from './app';
 
 const PORT = 3001;
 
-
-app.listen(PORT, () => {
-    console.log(`Word Microservice running on port ${PORT}`);
-});
+const port = process.argv[2] || 3000;
+app.listen(port, () => console.log(`Backend running on port ${port}`));

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface WordEntry {
     word: string;
@@ -10,16 +10,27 @@ export default function DictionaryApp() {
     const [words, setWords] = useState<WordEntry[]>([]);
     const [newWord, setNewWord] = useState('');
     const [newMeanings, setNewMeanings] = useState('');
+    const [backendUrl, setBackendUrl] = useState<string | null>(null);
 
-    const API_BASE_URL = 'http://localhost:3001/api'; // Adjust backend URL/port as needed
+    // Get backend URL once, client-side only
+    useEffect(() => {
+        const url = new URL(window.location.href).searchParams.get('backend') ?? 'http://localhost:3000';
 
-    const fetchWords = async () => {
+        setBackendUrl(url);
+    }, []);
+
+    const API_BASE_URL = backendUrl ? backendUrl + '/api' : 'http://localhost:3000/api';
+
+    // Use useCallback to memoize fetchWords
+    const fetchWords = useCallback(async () => {
+        if (!API_BASE_URL) return;   // Wait for backend URL
         const res = await fetch(`${API_BASE_URL}/words`);
         const data = await res.json();
         setWords(data);
-    };
+    }, [API_BASE_URL]);
 
     const addWord = async () => {
+        if (!API_BASE_URL) return;
         await fetch(`${API_BASE_URL}/words`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -34,13 +45,19 @@ export default function DictionaryApp() {
     };
 
     const deleteWord = async (word: string) => {
+        if (!API_BASE_URL) return;
         await fetch(`${API_BASE_URL}/words/${word}`, { method: 'DELETE' });
         fetchWords();
     };
 
+    // Fetch words after backend URL is set
     useEffect(() => {
-        fetchWords();
-    }, []);
+        if (backendUrl) {
+            fetchWords();
+        }
+    }, [backendUrl, fetchWords]);
+
+    if (!backendUrl) return <p>Loading backend...</p>;  // Loader placeholder
 
     return (
         <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>

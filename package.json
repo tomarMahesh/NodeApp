@@ -1,0 +1,44 @@
+{
+  "name": "nodeapp",
+  "version": "1.0.0",
+  "description": "This repo contains one mfe configured to run at.\r Goto below projects and run them with \r `npm run dev`",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "npm run build-backend && npm run build-frontend",
+    "build-backend": "cd microservices && cd word-meaning-service && tsc ",
+    "build-frontend": "cd microfrontend && cd dictionary-frontend && npm run build",
+    "package": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.example.desktopapp",
+    "files": [
+      "main.js",
+      "preload.js",
+      "microservices/word-meaning-service/**",
+      "microfrontend/dictionary-frontend/build/**"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomarMahesh/NodeApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tomarMahesh/NodeApp/issues"
+  },
+  "homepage": "https://github.com/tomarMahesh/NodeApp#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "electron": "^37.2.3",
+    "electron-builder": "^26.0.12"
+  }
+}
